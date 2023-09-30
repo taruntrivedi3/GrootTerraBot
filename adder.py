@@ -97,6 +97,12 @@ def output_input_adder(out_bit_values):
     solutions = []
     solver = cp_model.CpSolver()
     # BEGIN STUDENT CODE
+    a_input = [variables[a_bit] for a_bit in a_bits]
+    b_input = [variables[b_bit] for b_bit in b_bits]
+    solution_collector = SolutionCollector(a_input, b_input)
+    solver.parameters.enumerate_all_solutions = True
+    status = solver.Solve(model, solution_collector)
+    solutions = solution_collector.solutions
     # END STUDENT CODE
 
     return solutions
@@ -106,10 +112,16 @@ class SolutionCollector(cp_model.CpSolverSolutionCallback):
     def __init__(self, a_bits, b_bits):
         cp_model.CpSolverSolutionCallback.__init__(self)
         # BEGIN STUDENT CODE
+        self.__a_bits = a_bits
+        self.__b_bits = b_bits
+        SolutionCollector.solutions = []
         # END STUDENT CODE
 
     def OnSolutionCallback(self):
         # BEGIN STUDENT CODE
+        a = [self.Value(a_bit) for a_bit in self.__a_bits]
+        b = [self.Value(b_bit) for b_bit in self.__b_bits]
+        SolutionCollector.solutions.append((a, b))
         # END STUDENT CODE
         pass
 
