@@ -1,12 +1,10 @@
-import rospy, ros_hardware, layers, light_monitor, logging_monitor 
+import rospy, ros_hardware, layers
 import sys, os, select, time
 from terrabot_utils import time_since_midnight
-import camera_behavior as cb 
-import email_behavior as eb 
-
 
 import greenhouse_behaviors as gb
 import ping_behavior as ping
+import email_behavior as email
 
 def init_ros(sim, name):
     if sim: rospy.set_param('use_sim_time', True)
@@ -39,24 +37,11 @@ class BehavioralGreenhouseAgent:
         #  save each of them as instance variables, and pass them all
         #  to instantiate a BehavioralLayer
         self.sensors = ros_hardware.ROSSensors()
-        self.actuators = ros_hardware.ROSActuators()
-        self.light = gb.Light()
-        self.raiseTemp = gb.RaiseTemp()
-        self.lowerTemp = gb.LowerTemp()
-        
-        self.lowerHumid = gb.LowerHumid()
-        
-        self.raiseMoist = gb.RaiseSMoist()
-        self.lowerMoist = gb.LowerSMoist()
-        
-        
-        
-        self.ping = ping.Ping()
-        self.behaviors = [self.light, self.raiseTemp,self.lowerTemp,self.lowerHumid,self.raiseMoist,self.lowerMoist,self.ping,self.takeImage, self.sendEmail] 
-        
-        
-        self.behavioral = layers.BehavioralLayer(self.sensors,self.actuators,self.behaviors)
         # BEGIN STUDENT CODE
+        self.actuators = ros_hardware.ROSActuators()
+        self.behaviors = [gb.Light(), gb.RaiseTemp(), gb.LowerTemp(), gb.LowerHumid(),
+                          gb.RaiseSMoist(), gb.LowerSMoist(), ping.Ping(), email.Email()]
+        self.behavioral = layers.BehavioralLayer(self.sensors, self.actuators, self.behaviors)
         # END STUDENT CODE
 
     def main(self):
@@ -84,41 +69,18 @@ class LayeredGreenhouseAgent:
         #  the executive to the planning layer.
         # Don't forget to have the planning layer invoke getNewSchedule
         self.sensors = ros_hardware.ROSSensors()
-        self.actuators = ros_hardware.ROSActuators()
-        self.light = gb.Light()
-        self.raiseTemp = gb.RaiseTemp()
-        self.lowerTemp = gb.LowerTemp()
-        
-        self.lowerHumid = gb.LowerHumid()
-        
-        self.raiseMoist = gb.RaiseSMoist()
-        self.lowerMoist = gb.LowerSMoist()
-        
-        self.ping = ping.Ping()
-        #self.takeImage = cb.TakeImage()
-        #self.sendEmail = eb.Email()
-        
-        self.behaviors = [self.light, self.raiseTemp,self.lowerTemp,self.lowerHumid,self.raiseMoist,self.lowerMoist,self.ping] 
-        
-        self.executive = layers.ExecutiveLayer()
-        
-        self.behavioral = layers.BehavioralLayer(self.sensors,self.actuators,self.behaviors)
-        
-        self.executive.setBehavioralLayer(self.behavioral)
-        
-        self.planninglayer = layers.PlanningLayer(schedulefile)
-        self.executive.setPlanningLayer(self.planninglayer)
-        
-        self.planninglayer.setExecutive(self.executive)
-        
-        #layers.PlanningLayer.getNewSchedule(self.planninglayer)
-        
-        self.planninglayer.getNewSchedule()
-        self.executive.setMonitors(self.sensors, self.actuators.actuator_state,[light_monitor.LightMonitor(),logging_monitor.LoggingMonitor()])
-        
-       
-        
         # BEGIN STUDENT CODE
+        self.actuators = ros_hardware.ROSActuators()
+        self.behaviors = [gb.Light(), gb.RaiseTemp(), gb.LowerTemp(), gb.LowerHumid(),
+                          gb.RaiseSMoist(), gb.LowerSMoist(), ping.Ping(), email.Email()]
+        self.behavioral = layers.BehavioralLayer(self.sensors, self.actuators, self.behaviors)
+
+        self.executive = layers.ExecutiveLayer()
+        self.executive.setBehavioralLayer(self.behavioral)
+        self.executive.setPlanningLayer(layers.PlanningLayer(schedulefile))
+        self.executive.planning.setExecutive(self.executive)
+        self.executive.planning.getNewSchedule()
+        self.behavioral.startBehavior("PingBehavior")
         # END STUDENT CODE
 
     def main(self):
@@ -127,8 +89,8 @@ class LayeredGreenhouseAgent:
             t = time_since_midnight(rospy.get_time())
             # Run a step of each layer of the architecture
             # BEGIN STUDENT CODE
+            self.executive.planning.doStep(t)
             self.executive.doStep(t)
-            self.planninglayer.doStep(t)
             self.behavioral.doStep()
             # END STUDENT CODE
             rospy.sleep(1)
