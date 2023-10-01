@@ -22,6 +22,7 @@ class TakeImage(Behavior):
         self.last_time = 24*60*60
         self.pathname = ""
         self.initial = 'halt'
+        self.directory = '/home/robotanist/Desktop/TerraBot/pictures'
         self.states = [self.initial, 'init', 'light', 'check', 'recheck', 'done']
         
         self.fsm = Machine(self, states=self.states, initial=self.initial,
@@ -35,20 +36,24 @@ class TakeImage(Behavior):
         self.fsm.add_transition('disable', 'recheck', self.initial, after=['setEnd'])
         self.fsm.add_transition('disable', 'done', self.initial, after=['setEnd'])
         
+        #self.fsm.add_transition('doStep', 'init', 'done', conditions=['moreThan3Pics'], after=[])
+        
         self.fsm.add_transition('doStep', 'init', 'init', conditions=['isNextDay'], after=['nextDay'])
         self.fsm.add_transition('doStep', 'init', 'light', conditions=['isToday'], after=['setTimer5'])
         
         self.fsm.add_transition('doStep', 'light', 'light', conditions=['isLight2low', 'isTimeUp'], after=['raiseLight', 'setTimer5'])
         self.fsm.add_transition('doStep', 'light', 'light', conditions=['isLight2high', 'isTimeUp'], after=['lowerLight', 'setTimer5'])
-        self.fsm.add_transition('doStep', 'light', 'check', conditions=['isLightGood', 'isTimeUp', 'noMoreThan3Pics'], after=['acquireImg', 'setTimer10'])
+        self.fsm.add_transition('doStep', 'light', 'check', conditions=['isLightGood', 'isTimeUp', 'noMoreThan3Pics', 'dirExist'], after=['acquireImg', 'setTimer10'])
+        self.fsm.add_transition('doStep', 'light', 'done', conditions=['isLightGood', 'isTimeUp', 'noMoreThan3Pics', 'noDirExist'], after=['raiseError'])
         self.fsm.add_transition('doStep', 'light', 'done', conditions=['moreThan3Pics'])
         
         self.fsm.add_transition('doStep', 'check', self.initial, conditions=['fileExist', 'isTimeUp'], after=['setInitial', 'addCnt'])
-        self.fsm.add_transition('doStep', 'check', 'recheck', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Pics'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'check', 'recheck', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Pics', 'direExist'], after=['reacquireImg', 'setTimer20'])
         self.fsm.add_transition('doStep', 'check', 'done', conditions=['moreThan3Pics'])
         
         self.fsm.add_transition('doStep', 'recheck', self.initial, conditions=['fileExist', 'isTimeUp'], after=['setInitial', 'addCnt'])
-        self.fsm.add_transition('doStep', 'recheck', 'recheck', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'recheck', 'recheck', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics', 'dirExist'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'recheck', 'done', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics', 'noDirExist'], after=['raiseError'])       
         self.fsm.add_transition('doStep', 'recheck', 'done', conditions=['moreThan3Pics'])
         self.fsm.add_transition('doStep', 'recheck', self.initial, conditions=['nofileExist', 'isTimeUp', 'moreThan3Trials'], after=['printWarning', 'setInitial'])
         # END STUDENT CODE
@@ -81,6 +86,11 @@ class TakeImage(Behavior):
         return op.exists(self.pathname)
     def noFileExist(self):
         return not(op.exists(self.pathname))
+    
+    def dirExist(self):
+        return op.exists(self.directory)
+    def noDirExist(self):
+        return not(op.exists(self.directory))
     
     def noMoreThan3Trials(self):
         return self.retry_cnt <= 2
@@ -141,7 +151,9 @@ class TakeImage(Behavior):
         print("Have taken (%s) images" %self.img_cnt)
                               
     def printWarning(self):
-        print("Warning: Tried to acquire the image unsuccessfully three times in a row!")   
+        print("Warning: Tried to acquire the image unsuccessfully three times in a row!") 
+    def raiseError(self):
+        print("Error: Writing to a non-existent directory!")  
     # END STUDENT CODE
 
     def perceive(self):
