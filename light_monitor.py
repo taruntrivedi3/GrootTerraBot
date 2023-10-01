@@ -61,8 +61,8 @@ class LightMonitor(Monitor):
 
             # BEGIN STUDENT CODE
             #adding too much
-            print('self.light: ' + str(self.light))
-            print('self.dt: ' + str(self.dt))
+            #print('self.light: ' + str(self.light))
+            #print('self.dt: ' + str(self.dt))
             
             self.insolation += (self.light * (self.dt - 15)/3600) 
             
@@ -79,22 +79,22 @@ class LightMonitor(Monitor):
             self.insolation += ( self.last_ambient_light_to_come - ambient_light_to_come ) 
             
             
-            print('self.insolation' + str(self.insolation))
+            #print('self.insolation' + str(self.insolation))
             
             self.last_ambient_light_to_come = ambient_light_to_come
             
-            print('ambient_light_to_come: ' + str(ambient_light_to_come))
+            #print('ambient_light_to_come: ' + str(ambient_light_to_come))
             
             time_left_of_light_behavior = self.lighting_time_left(self.mtime)/3600
-            print('time_left_of_light_behavior in hours: ' + str(time_left_of_light_behavior))
+            #print('time_left_of_light_behavior in hours: ' + str(time_left_of_light_behavior))
             
             difference = self.target - ambient_light_to_come - self.insolation
             
-            print('difference: ' + str(difference)) 
+            #print('difference: ' + str(difference)) 
             
             if time_left_of_light_behavior != 0:
             	self.current_optimal = difference/(time_left_of_light_behavior)
-            	print('optimal : ' + str(self.current_optimal))
+            	#print('optimal : ' + str(self.current_optimal))
             	self.lightBehavior.setOptimal(self.current_optimal)
             
             #if time_left_of_light_behavior != 0:
