@@ -1,0 +1,15 @@
+Test 1: Check if RaiseTemp is working correctly
+	Detail1: make sure the LEDs actuator is turned on/off correctly and check whether the LEDs are within their limits when RaiseTemp behavior is on; make sure the physical LEDs are working correctly by looking through the camera
+	Detail2: check the other temperature sensors to see if they’re also really high or if the additional sensor is a faulty sensor 	
+This test indicates whether the working status of the LEDs is wrong, which may lead to the failure of raiseTemp behavior. If the LEDs are not working properly, the temperature can be raised much higher than expected, causing a very high temperature in the additional sensor. We may want to repair/replace the broken LED actuator or the broken LED lights to potentially recover from it.
+
+Test 2: Check if LowerTemp is working correctly
+	Detail1: make sure the fans actuator is turned on correctly when LowerTempBehavior is on and the temperature is too high
+	Detail2: check the physical fans are working by looking through the camera and hearing from the microphone
+	This test indicates whether the working status of the fans is wrong, which may lead to the failure of LowerTemp behavior. When the fans are malfunctioning, the temperature won’t be lowered as expected, causing a very high temperature in the additional sensor. We may want to repair/replace the fan actuator or the broken fan itself to potentially recover from it.
+
+We choose Test 1.
+Reason 1: The LEDs system is the only direct cause to an extremely high temperature because it is the only source of heat. Since the LEDs are the primary source of heat, conducting Test 1 allows us to specifically target the most likely cause of the high temperature reading, enabling a more focused investigation.
+Reason 2: This test checks other temperature sensors so that it detects potential problems with the additional sensor itself.
+Pro: The LEDs can be controlled easily without affecting other systems, minimizing any potential stress on the plants or other equipment. Adjusting LED will not affect the system shortly.
+Con: There may still be other factors influencing the temperature, such as a malfunctioning LowerTemperature behavior (e.g. broken fans, stop working fans actuator, …)
