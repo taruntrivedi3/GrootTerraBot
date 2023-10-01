@@ -39,6 +39,7 @@ class TakeImage(Behavior):
         #self.fsm.add_transition('doStep', 'init', 'done', conditions=['moreThan3Pics'], after=[])
         
         self.fsm.add_transition('doStep', 'init', 'init', conditions=['isNextDay'], after=['nextDay'])
+        self.fsm.add_transition('doStep', 'init', 'init', conditions=['noDirExist'], after=['createDir'])
         self.fsm.add_transition('doStep', 'init', 'light', conditions=['isToday'], after=['setTimer5'])
         
         self.fsm.add_transition('doStep', 'light', 'light', conditions=['isLight2low', 'isTimeUp'], after=['raiseLight', 'setTimer5'])
@@ -48,7 +49,8 @@ class TakeImage(Behavior):
         self.fsm.add_transition('doStep', 'light', 'done', conditions=['moreThan3Pics'])
         
         self.fsm.add_transition('doStep', 'check', self.initial, conditions=['fileExist', 'isTimeUp'], after=['setInitial', 'addCnt'])
-        self.fsm.add_transition('doStep', 'check', 'recheck', conditions=['noFileExist', 'isTimeUp', 'noMoreThan3Pics', 'direExist'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'check', 'recheck', conditions=['noFileExist', 'isTimeUp', 'noMoreThan3Pics', 'dirExist'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'check', 'done', conditions=['noFileExist', 'isTimeUp', 'noMoreThan3Pics', 'noDirExist'], after=['raiseError'])
         self.fsm.add_transition('doStep', 'check', 'done', conditions=['moreThan3Pics'])
         
         self.fsm.add_transition('doStep', 'recheck', self.initial, conditions=['fileExist', 'isTimeUp'], after=['setInitial', 'addCnt'])
@@ -133,14 +135,16 @@ class TakeImage(Behavior):
         self.img_cnt = 0
         self.setLastTime() 
     
+    def createDir(self):
+        os.mkdir(self.directory)
     def acquireImg(self):
-        name = '/home/robotanist/Desktop/TerraBot/pictures/pic' + str(int(self.time)) + '.jpg'
+        name = self.directory + '/pic' + str(int(self.time)) + '.jpg'
         self.pathname = name
         self.actuators.doActions((self.name, self.sensors.getTime(),
                                   {"camera": name}))  
         print("Taking Image, and Light Level is (%s)" %self.light)                        
     def reacquireImg(self):
-        name = '/home/robotanist/Desktop/TerraBot/pictures/pic' + str(int(self.time)) + '.jpg'
+        name = self.directory + '/pic' + str(int(self.time)) + '.jpg'
         self.pathname = name
         self.retry_cnt += 1
         self.actuators.doActions((self.name, self.sensors.getTime(),
