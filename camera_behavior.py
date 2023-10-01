@@ -48,14 +48,14 @@ class TakeImage(Behavior):
         self.fsm.add_transition('doStep', 'light', 'done', conditions=['moreThan3Pics'])
         
         self.fsm.add_transition('doStep', 'check', self.initial, conditions=['fileExist', 'isTimeUp'], after=['setInitial', 'addCnt'])
-        self.fsm.add_transition('doStep', 'check', 'recheck', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Pics', 'direExist'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'check', 'recheck', conditions=['noFileExist', 'isTimeUp', 'noMoreThan3Pics', 'direExist'], after=['reacquireImg', 'setTimer20'])
         self.fsm.add_transition('doStep', 'check', 'done', conditions=['moreThan3Pics'])
         
         self.fsm.add_transition('doStep', 'recheck', self.initial, conditions=['fileExist', 'isTimeUp'], after=['setInitial', 'addCnt'])
-        self.fsm.add_transition('doStep', 'recheck', 'recheck', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics', 'dirExist'], after=['reacquireImg', 'setTimer20'])
-        self.fsm.add_transition('doStep', 'recheck', 'done', conditions=['nofileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics', 'noDirExist'], after=['raiseError'])       
+        self.fsm.add_transition('doStep', 'recheck', 'recheck', conditions=['noFileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics', 'dirExist'], after=['reacquireImg', 'setTimer20'])
+        self.fsm.add_transition('doStep', 'recheck', 'done', conditions=['noFileExist', 'isTimeUp', 'noMoreThan3Trials', 'noMoreThan3Pics', 'noDirExist'], after=['raiseError'])       
         self.fsm.add_transition('doStep', 'recheck', 'done', conditions=['moreThan3Pics'])
-        self.fsm.add_transition('doStep', 'recheck', self.initial, conditions=['nofileExist', 'isTimeUp', 'moreThan3Trials'], after=['printWarning', 'setInitial'])
+        self.fsm.add_transition('doStep', 'recheck', self.initial, conditions=['noFileExist', 'isTimeUp', 'moreThan3Trials'], after=['printWarning', 'setInitial'])
         # END STUDENT CODE
 
     # Add the condition and action functions
