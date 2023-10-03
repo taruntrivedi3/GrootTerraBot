@@ -60,7 +60,7 @@ class Email(Behavior):
             images = [pictures_directory / most_recent]
         else:
             text = text + "no images in TerraBot/pictures"
-        send(from_email, from_pass, to_emails, group_name + date_string, text, most_recent, images, False)
+        send(from_email, from_pass, to_emails, group_name + date_string, text, most_recent, images, True)
     # END STUDENT CODE
 
     def perceive(self):
