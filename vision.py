@@ -11,10 +11,13 @@ def classifyFoliage(image):
     # Create a mask that has 255 where there is part of a plant in the image
     #   and 0 everywhere else
     # BEGIN STUDENT CODE
-    x_rVals = [(22, 83), (0, 255), (24, 176)]
+    x_rVals = [(22, 83), (0, 255), (30, 176)]
     x_color_space = 'HSV'
     x_image = transformFromBGR(image, x_color_space)
     x_image = cv2.blur(x_image, (3, 3))
+    kernel = np.ones((50, 50), np.uint8)
+    x_image = cv2.erode(x_image, kernel, iterations=1)
+    x_image = cv2.dilate(x_image, kernel, iterations=1)
     x_foliage_mask = createMask(x_image, x_rVals, x_color_space)
     # END STUDENT CODE
     return x_foliage_mask
