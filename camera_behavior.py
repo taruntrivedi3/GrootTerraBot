@@ -23,6 +23,7 @@ class TakeImage(Behavior):
         self.pathname = ""
         self.initial = 'halt'
         self.directory = '/home/robotanist/Desktop/TerraBot/pictures'
+        self.modified_directory = '/home/robotanist/Desktop/TerraBot/modified_pictures'
         self.states = [self.initial, 'init', 'light', 'check', 'recheck', 'done']
         
         self.fsm = Machine(self, states=self.states, initial=self.initial,
@@ -137,6 +138,7 @@ class TakeImage(Behavior):
     
     def createDir(self):
         os.mkdir(self.directory)
+        os.mkdir(self.modified_directory)
     def acquireImg(self):
         name = self.directory + '/pic' + str(int(self.time)) + '.jpg'
         self.pathname = name
