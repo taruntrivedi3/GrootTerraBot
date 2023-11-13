@@ -437,6 +437,16 @@ class RaiseSMoist(Behavior):
         self.total_water += dwater
         print("calcWaterAdded: %.1f (%.1f = %.1f - %.1f)"
               %(self.total_water, dwater, self.weight_est, self.start_weight))
+
+        # keep track of how much water was added
+        try:
+            with open('water.txt', 'r') as file:
+                daily_total = float(file.read())
+            daily_total += dwater
+            with open('water.txt', 'w') as file:
+                file.write(str(daily_total))
+        except:
+            pass
         
     def printWateredEnough(self):
         print("Watered Enough: %.1f" %self.total_water)

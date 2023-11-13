@@ -51,6 +51,11 @@ class LightMonitor(Monitor):
         #print("INSOLATION: %.1f %d" %(self.mtime/3600.0, self.insolation))
         if (self.mtime < time_since_midnight(self.last_time)):
             print("INSOLATION TODAY: %.1f" %self.insolation)
+            try:
+                with open('insolation.txt', 'w') as file:
+                    file.write(str(self.insolation))
+            except:
+                pass
             self.reset()
         else:
             # Calculate the optimal light level to reach the target value,
