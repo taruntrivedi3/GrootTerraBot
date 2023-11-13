@@ -94,28 +94,137 @@ def colorCorrect(image, blue_goal, green_goal, red_goal):
     # Do this by solving d = A x, as per the lecture notes.
     # Note that while the lecture notes describe an affine (3x4) transform,
     #  here we have only 3 colors, so it has to be a Euclidean (3x3) tranform
+    image_height, image_width = image.shape[0],image.shape[1]
+    red_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+
+    red_square_coords = np.array([
+    [1140,244],  # Top-left corner
+    [1283,244],    # Top-right corner
+    [1283,395],      # Bottom-right corner
+    [1140,395],    # Bottom-left corner
+    ], dtype=np.int32)
+
+    red_square_coords = red_square_coords.reshape((-1, 1, 2))
+    cv2.drawContours(red_mask, [red_square_coords], 0, 255, thickness=cv2.FILLED)
+    red_calib = cv2.mean(image, red_mask)[:-1]
+    
+
+    green_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+
+    green_square_coords = np.array([
+    [1356,244],  # Top-left corner
+    [1499,244],    # Top-right corner
+    [1499,403],      # Bottom-right corner
+    [1356,403],    # Bottom-left corner
+    ], dtype=np.int32)
+
+    green_square_coords = green_square_coords.reshape((-1, 1, 2))
+    cv2.drawContours(green_mask, [green_square_coords], 0, 255, thickness=cv2.FILLED)
+    green_calib = cv2.mean(image, green_mask)[:-1]
+    
+
+    blue_mask = np.zeros((image_height, image_width), dtype=np.uint8)
+
+    blue_square_coords = np.array([
+    [1572,252],  # Top-left corner
+    [1707,252],    # Top-right corner
+    [1707,395],      # Bottom-right corner
+    [1572,395],    # Bottom-left corner
+    ], dtype=np.int32)
+
+    blue_square_coords = blue_square_coords.reshape((-1, 1, 2))
+    cv2.drawContours(blue_mask, [blue_square_coords], 0, 255, thickness=cv2.FILLED)
+    blue_calib = cv2.mean(image, blue_mask)[:-1]
+    
+    
+
     # BEGIN STUDENT CODE
+    #need to build out d, A, x 
     # END STUDENT CODE
+    all_goals = []
+    rg_B, rg_G, rg_R = red_goal[0], red_goal[1], red_goal[2]
+    all_goals.extend((rg_B,rg_G, rg_R))
+    gg_B, gg_G, gg_R = green_goal[0], green_goal[1], green_goal[2]
+    all_goals.extend((gg_B,gg_G,gg_R))
+    bg_B, bg_G, bg_R = blue_goal[0], blue_goal[1], blue_goal[2]
+    all_goals.extend((bg_B, bg_G, bg_R))
+
+
+    
 
     # Fill in the rows of the "A" matrix, according to the notes
     A = np.zeros((9, 9), np.float64)
-    # BEGIN STUDENT CODE
-    # END STUDENT CODE
+    # BEGIN STUDENT CODE in RGB, need to convert from BGR
+    
 
+
+    for i in range(3):
+        for j in range(3):
+            index = i*3 + j 
+            if index % 3 == 0:
+                A[i,index] = red_calib[0]
+            if index % 3 == 1:
+                A[i,index] = red_calib[1]
+            if index % 3 == 2:
+                A[i,index] = red_calib[2]
+
+    for i in range(3,6):
+        for j in range(3):
+            index = (i-3)*3 + j
+            
+            if index % 3 == 0:
+                A[i,index] = green_calib[0]
+            if index % 3 == 1:
+                A[i,index] = green_calib[1]
+            if index % 3 == 2:
+                A[i,index] = green_calib[2]
+    
+    for i in range(6,9):
+        for j in range(3):
+            index = (i-6)*3 + j 
+            if index % 3 == 0:
+                A[i,index] = blue_calib[0]
+            if index % 3 == 1:
+                A[i,index] = blue_calib[1]
+            if index % 3 == 2:
+                A[i,index] = blue_calib[2]
+
+    # END STUDENT CODE
+    
     # Fill in the "d" vector with the "goal" colors 
     d = np.zeros((1,9))
     # BEGIN STUDENT CODE
+    
+    for i in range(len(all_goals)):
+        d[0,i] = all_goals[i]
+    
     # END STUDENT CODE
 
     x = np.matmul(np.matmul(np.linalg.pinv(np.matmul(A.T, A)), A.T), d.T)
     T = x.reshape((3,3))
-
+    
     # Apply the transform to the pixels of the image and return the
     #  new corrected_image
     corrected_image = image.copy()
+
+    width = corrected_image.shape[0]
+    height = corrected_image.shape[1]
+    
+    reshaped_array = corrected_image.reshape(-1,3)
+    
+    reshaped_array_T = np.transpose(reshaped_array)
+    result_array = np.matmul(T,reshaped_array_T)
+    result_array = np.transpose(result_array)
+    result_array = result_array.reshape(width, height, 3)
+    
+    #norm_image = cv2.normalize(result_array, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+
+
+
+
     # BEGIN STUDENT CODE
     # END STUDENT CODE
-    return corrected_image
+    return result_array
 
 # Given an image, return three values:
 # 1. An image with all non-foliage parts masked out
