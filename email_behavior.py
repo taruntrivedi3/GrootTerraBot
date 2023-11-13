@@ -13,8 +13,8 @@ number, the date and time, the current sensor and actuator readings, and
 the most recent image taken
 '''
 
-to_emails = 'taward@andrew.cmu.edu'
-#to_emails = 'taward@andrew.cmu.edu, ttrivedi@andrew.cmu.edu, yifansun@andrew.cmu.edu'
+#to_emails = 'taward@andrew.cmu.edu'
+to_emails = 'taward@andrew.cmu.edu, ttrivedi@andrew.cmu.edu, yifansun@andrew.cmu.edu'
 from_email = 'TerraBot9@outlook.com'
 from_pass = 'Admoni467'
 group_name = 'I am Groot / TB9 '
