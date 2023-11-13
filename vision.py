@@ -3,24 +3,35 @@ import cv2
 from cv_utils import *
 from filterColor import createMask, transformFromBGR
 
+def gammaCorrection(image, gamma):
+    table = np.array([int(((i/255.)**gamma)*255) for i in range(256)], np.uint8)
+    return cv2.LUT(image, table)
 
 # Detect the plants in the image using color histograms. Return a mask
 #  (black/white image, where 0 indicates no plants and 255 indicates plants)
 def classifyFoliage(image):
-    #foliage_mask = np.zeros(image.shape[0:2], np.uint8)
+    foliage_mask = np.zeros(image.shape[0:2], np.uint8)
     # Create a mask that has 255 where there is part of a plant in the image
     #   and 0 everywhere else
     # BEGIN STUDENT CODE
-    x_rVals = [(22, 83), (0, 255), (30, 176)]
+    # x_rVals = [(22, 83), (0, 255), (30, 176)]
+    # x_color_space = 'HSV'
+    # x_image = transformFromBGR(image, x_color_space)
+    # x_image = cv2.blur(x_image, (3, 3))
+    # kernel = np.ones((50, 50), np.uint8)
+    # x_image = cv2.erode(x_image, kernel, iterations=1)
+    # x_image = cv2.dilate(x_image, kernel, iterations=1)
+    # x_foliage_mask = createMask(x_image, x_rVals, x_color_space)
+    image = gammaCorrection(image, 1.6)
+    x_rVals = [(22, 68), (140, 255), (10, 235)]
     x_color_space = 'HSV'
+    image = cv2.filter2D(image, ddepth=-1, kernel=(np.ones((7,7))/49))
     x_image = transformFromBGR(image, x_color_space)
-    x_image = cv2.blur(x_image, (3, 3))
-    kernel = np.ones((50, 50), np.uint8)
-    x_image = cv2.erode(x_image, kernel, iterations=1)
-    x_image = cv2.dilate(x_image, kernel, iterations=1)
-    x_foliage_mask = createMask(x_image, x_rVals, x_color_space)
+    foliage_mask = createMask(x_image, x_rVals, x_color_space).astype(np.uint8)
+    foliage_mask = cv2.erode(foliage_mask, kernel=np.ones((10,10))) # 3,3 8, 8
+    foliage_mask = cv2.dilate(foliage_mask, kernel=np.ones((17,17)))
     # END STUDENT CODE
-    return x_foliage_mask
+    return foliage_mask
 
 # Return the bounding box of the measuring stick
 # You can either use the image to find the stick or determine the corners by hand,
@@ -48,6 +59,7 @@ def measureHeight(image, foliage_mask):
     cv2.drawContours(stick_mask, [contour], 0, 255, -1)
     
     combined_mask = cv2.bitwise_and(foliage_mask, stick_mask)
+    combined_mask = cv2.erode(combined_mask, kernel=np.ones((13,13)), iterations=2)
     height_list = [360, 585, 820, 1020, 1215, 1390, 1560, 1720, 1870, 2000]
 
     # END STUDENT CODE
@@ -58,7 +70,7 @@ def measureHeight(image, foliage_mask):
     nonzero_points = np.argwhere(combined_mask > 0)
 
     if len(nonzero_points) == 0: 
-        return None, None 
+        return 0, contour[3][1] 
      
     else: 
         #highest_point = nonzero_points[np.argmax(nonzero_points[:, 1])]
@@ -80,7 +92,7 @@ def measureHeight(image, foliage_mask):
             elif height_fin >= height_list[0] and height_fin < height_list[1]:
                 stick_diff = height_list[0] - height_list[1]
                 foilage_height = height_fin - height_list[0]
-                height = ((9-i) + (foilage_height/stick_diff))
+                height = (9 + (foilage_height/stick_diff))
         if height == 0:
             top_row = contour[3][1]
     # END STUDENT CODE
@@ -239,26 +251,14 @@ def foliageImages (image):
     height, row = measureHeight(image, foliage_mask)
     foliageImage = None
     # BEGIN STUDENT CODE
-    foliage_mask = cv2.cvtColor(foliage_mask, cv2.COLOR_GRAY2BGR)
-    foliageImage = cv2.bitwise_and(image,foliage_mask)
+    foliageImage = cv2.bitwise_and(image, image, mask=foliage_mask)
     boundingBox = findStick(image)
-    #image = cv2.polylines(image, [boundingBox], isClosed=True, color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[0], boundingBox[1], color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[1], boundingBox[2], color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[2], boundingBox[3], color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[3], boundingBox[0], color=(255, 0, 0), thickness=10)
-    intersection = []
-    edges = [(boundingBox[1], boundingBox[2]), (boundingBox[3], boundingBox[0])]
-    for pt1, pt2 in edges:
-        if min(pt1[1], pt2[1]) <= row <= max(pt1[1], pt2[1]):
-    	    inter = int(pt1[0]+(row-pt1[1])*(pt2[0]-pt1[0])/(pt2[1]-pt1[1]))
-    	    intersection.append(inter)
-    if len(intersection) == 0:
-        start_point = boundingBox[3][0], row
-        end_point = boundingBox[1][0], row
-    else:
-        start_point = (intersection[1]-20, row)
-        end_point = (intersection[0]+20, row)
+    start_point = boundingBox[3][0], row
+    end_point = boundingBox[1][0], row
     image = cv2.line(image, start_point, end_point, color=(0, 0, 255), thickness=10)
     # END STUDENT CODE
     return foliageImage, image, height
