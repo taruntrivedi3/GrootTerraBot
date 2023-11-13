@@ -29,7 +29,7 @@ def init(sender, password):
 * images[list of jpgs]: the image to be included
 *****************************************************************************
 """
-def send(from_address, password, to_address, subject, text, most_recent, images=[], instructors=False):
+def send(from_address, password, to_address, subject, text, images=[], instructors=False):
 
     if instructors:
         to_address += ', rsimmons@andrew.cmu.edu, tcantala@andrew.cmu.edu'
@@ -45,10 +45,9 @@ def send(from_address, password, to_address, subject, text, most_recent, images=
     msg['From'] = from_address
     msg['To'] = to_address
     msg.set_content(text)
-    for image in images:
-        with open(image, 'rb') as f:
-            image_data = f.read()
-        msg.add_attachment(image_data, maintype='image', subtype='jpeg', filename=most_recent)
+    for (name, image) in images:
+        print(name)
+        msg.add_attachment(image, maintype='image', subtype='jpeg', filename=name)
 
     success = True
     try:
