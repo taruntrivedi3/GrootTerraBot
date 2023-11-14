@@ -39,7 +39,7 @@ def classifyFoliage(image):
 def findStick (image):
     boundingBox = np.array([[0,0]])
     # BEGIN STUDENT CODE
-    boundingBox = np.array([[1960,280], [2046, 280], [1920, 2100], [1846, 2100]])
+    boundingBox = np.array([[1960,280], [2053, 280], [1938, 2100], [1848, 2100]])
     # END STUDENT CODE
     return boundingBox
 
@@ -59,7 +59,7 @@ def measureHeight(image, foliage_mask):
     cv2.drawContours(stick_mask, [contour], 0, 255, -1)
     
     combined_mask = cv2.bitwise_and(foliage_mask, stick_mask)
-    combined_mask = cv2.erode(combined_mask, kernel=np.ones((13,13)), iterations=2)
+    combined_mask = cv2.erode(combined_mask, kernel=np.ones((25,25)), iterations=1)
     height_list = [360, 585, 820, 1020, 1215, 1390, 1560, 1720, 1870, 2000]
 
     # END STUDENT CODE
@@ -70,7 +70,7 @@ def measureHeight(image, foliage_mask):
     nonzero_points = np.argwhere(combined_mask > 0)
 
     if len(nonzero_points) == 0: 
-        return 0, contour[3][1] 
+        return None, None 
      
     else: 
         #highest_point = nonzero_points[np.argmax(nonzero_points[:, 1])]
@@ -251,12 +251,16 @@ def foliageImages (image):
     height, row = measureHeight(image, foliage_mask)
     foliageImage = None
     # BEGIN STUDENT CODE
+    if not(height):
+        height = 0
     foliageImage = cv2.bitwise_and(image, image, mask=foliage_mask)
     boundingBox = findStick(image)
     image = cv2.line(image, boundingBox[0], boundingBox[1], color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[1], boundingBox[2], color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[2], boundingBox[3], color=(255, 0, 0), thickness=10)
     image = cv2.line(image, boundingBox[3], boundingBox[0], color=(255, 0, 0), thickness=10)
+    if height == 0:
+        row = boundingBox[3][1]
     start_point = boundingBox[3][0], row
     end_point = boundingBox[1][0], row
     image = cv2.line(image, start_point, end_point, color=(0, 0, 255), thickness=10)
@@ -277,6 +281,8 @@ def plantHealth (image):
     # BEGIN STUDENT CODE
     global last_height, last_greenery
     greenery = cv2.countNonZero(foliage_mask)/(image.shape[0]*image.shape[1])
+    if not(height):
+        height = 0
     if last_height == 0 or last_greenery == 0:
         if height > 0 or greenery > 0:
             health_msg = "good"
