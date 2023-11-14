@@ -39,7 +39,8 @@ def classifyFoliage(image):
 def findStick (image):
     boundingBox = np.array([[0,0]])
     # BEGIN STUDENT CODE
-    boundingBox = np.array([[1960,280], [2053, 280], [1938, 2100], [1848, 2100]])
+    # boundingBox = np.array([[1960,280], [2053, 280], [1938, 2100], [1848, 2100]])
+    boundingBox = np.array([[1465, 585], [1523, 585], [1508, 1765], [1465, 1765]])
     # END STUDENT CODE
     return boundingBox
 
@@ -57,7 +58,8 @@ def measureHeight(image, foliage_mask):
     
     intersection = cv2.bitwise_and(foliage_mask, stick_mask)
     intersection = cv2.erode(intersection, kernel=np.ones((25,25)), iterations=1)
-    height_list = [360, 585, 820, 1020, 1215, 1390, 1560, 1720, 1870, 2000]
+    # height_list = [360, 585, 820, 1020, 1215, 1390, 1560, 1720, 1870, 2000]
+    height_list = [730, 860, 990, 1115, 1235, 1350, 1460, 1565, 1670, 1765]
 
     if not np.any(intersection):
         return None,None
@@ -237,15 +239,15 @@ def foliageImages (image):
         height = 0
     foliageImage = cv2.bitwise_and(image, image, mask=foliage_mask)
     boundingBox = findStick(image)
-    image = cv2.line(image, tuple(boundingBox[0]), tuple(boundingBox[1]), color=(255, 0, 0), thickness=10)
-    image = cv2.line(image, tuple(boundingBox[1]), tuple(boundingBox[2]), color=(255, 0, 0), thickness=10)
-    image = cv2.line(image, tuple(boundingBox[2]), tuple(boundingBox[3]), color=(255, 0, 0), thickness=10)
-    image = cv2.line(image, tuple(boundingBox[3]), tuple(boundingBox[0]), color=(255, 0, 0), thickness=10)
+    image = cv2.line(image, tuple(boundingBox[0]), tuple(boundingBox[1]), color=(255, 0, 0), thickness=5)
+    image = cv2.line(image, tuple(boundingBox[1]), tuple(boundingBox[2]), color=(255, 0, 0), thickness=5)
+    image = cv2.line(image, tuple(boundingBox[2]), tuple(boundingBox[3]), color=(255, 0, 0), thickness=5)
+    image = cv2.line(image, tuple(boundingBox[3]), tuple(boundingBox[0]), color=(255, 0, 0), thickness=5)
     if height == 0:
         row = boundingBox[3][1]
     start_point = (boundingBox[3][0], row)
     end_point = (boundingBox[1][0], row)
-    image = cv2.line(image, start_point, end_point, color=(0, 0, 255), thickness=10)
+    image = cv2.line(image, start_point, end_point, color=(0, 0, 255), thickness=5)
     # END STUDENT CODE
     return foliageImage, image, height
 
