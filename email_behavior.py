@@ -78,7 +78,8 @@ class Email(Behavior):
         try:
             with open('insolation.txt', 'r') as file:
                 insolation = file.read()
-            insolation_msg = f"""Yesterday there was a total insolation of {round(insolation, 2)}."""
+            print(insolation)
+            insolation_msg = f"""Yesterday there was a total insolation of {round(float(insolation.strip()), 2)}."""
 
         except:
             insolation_msg = "We are not able to currently access yesterday's total insolation."
@@ -152,7 +153,7 @@ class Email(Behavior):
         self.health_msg_y = health_msg
 
         # send email
-        send(from_email, from_pass, to_emails, group_name + date_string, text, images, True)
+        send(from_email, from_pass, to_emails, group_name + date_string, text, images, False)
     # END STUDENT CODE
 
     def perceive(self):
