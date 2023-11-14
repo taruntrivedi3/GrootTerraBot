@@ -153,7 +153,7 @@ class Email(Behavior):
         self.health_msg_y = health_msg
 
         # send email
-        send(from_email, from_pass, to_emails, group_name + date_string, text, images, False)
+        send(from_email, from_pass, to_emails, group_name + date_string, text, images, True)
     # END STUDENT CODE
 
     def perceive(self):
