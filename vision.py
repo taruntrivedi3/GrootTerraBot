@@ -50,53 +50,35 @@ def findStick (image):
 #   return the height in cms the tallest plant that crosses in front 
 #   of the measuring stick. Return None if no foliage overlaps the stick
 def measureHeight(image, foliage_mask):
-    # First, use the bounding box returned from findStick to create a mask
     #   of the measuring stick
-    stick_mask = np.zeros(foliage_mask.shape[0:2], np.uint8)
-    # BEGIN STUDENT CODE    
+    stick_mask = np.zeros(foliage_mask.shape, np.uint8)
     contour = findStick(image)
-    
     cv2.drawContours(stick_mask, [contour], 0, 255, -1)
     
-    combined_mask = cv2.bitwise_and(foliage_mask, stick_mask)
-    combined_mask = cv2.erode(combined_mask, kernel=np.ones((25,25)), iterations=1)
+    intersection = cv2.bitwise_and(foliage_mask, stick_mask)
+    intersection = cv2.erode(intersection, kernel=np.ones((25,25)), iterations=1)
     height_list = [360, 585, 820, 1020, 1215, 1390, 1560, 1720, 1870, 2000]
 
-    # END STUDENT CODE
-
-    # Find the maximum height of plants that overlap the measuring stick
-    #   in the foliage_mask
-    # BEGIN STUDENT CODE
-    nonzero_points = np.argwhere(combined_mask > 0)
-
-    if len(nonzero_points) == 0: 
-        return None, None 
-     
-    else: 
-        #highest_point = nonzero_points[np.argmax(nonzero_points[:, 1])]
-        highest_point = nonzero_points[np.argmin(nonzero_points[:, 0])]
-        highest_point_row = highest_point[0]
-        height_fin = highest_point_row
-
-        #height, top_row = None
-        top_row = highest_point_row
-        height = 0 
+    if not np.any(intersection):
+        return None,None
+    nonzero = np.argwhere(intersection > 0)
+    highest_point = nonzero[np.argmin(nonzero[:, 0])]
+    height_row = highest_point[0]
+    height = 0 
         
-        for i in range(len(height_list)):
-            if (i > 0 and height_fin >= height_list[i]): 
-                stick_diff = height_list[i-1] - height_list[i]
-
-                foilage_height = height_fin - height_list[i]
-                #print("foilage_height", foilage_height)
-                height = ((9-i) + (foilage_height/stick_diff))
-            elif height_fin >= height_list[0] and height_fin < height_list[1]:
-                stick_diff = height_list[0] - height_list[1]
-                foilage_height = height_fin - height_list[0]
-                height = (9 + (foilage_height/stick_diff))
-        if height == 0:
-            top_row = contour[3][1]
-    # END STUDENT CODE
-        return height, top_row
+    for i in range(0,len(height_list)):
+        if (i >= 1 and height_row >= height_list[i]): 
+            stick_diff = height_list[i-1] - height_list[i]
+            fol_dist = height_row - height_list[i]
+            height = 9 - i + (fol_dist/stick_diff)
+        elif height_row >= height_list[0] and height_row < height_list[1]:
+            stick_diff = height_list[0] - height_list[1]
+            fol_dist = height_row - height_list[0]
+            height = (9 + (fol_dist/stick_diff))
+    if height == 0:
+        height_row = contour[3][1]
+  
+    return height, height_row
     
 
 # Use the color calibration squares to find a transformation that will
