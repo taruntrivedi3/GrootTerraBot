@@ -38,6 +38,8 @@ class Email(Behavior):
 
         self.water_level_y = None
 
+        first_day = True
+
         with open('water.txt', 'w') as file:
             file.write("0.0")
         # END STUDENT CODE
@@ -76,9 +78,12 @@ class Email(Behavior):
         try:
             with open('insolation.txt', 'r') as file:
                 insolation = file.read()
-            insolation_msg = f"""Yesterday there was a total insolation of {insolation}."""
+            insolation_msg = f"""Yesterday there was a total insolation of {round(insolation, 2)}."""
+
         except:
             insolation_msg = "We are not able to currently access yesterday's total insolation."
+
+        first_day = False
 
         # Getting plant health and comparing to yesterdays
         greenery = 0
@@ -86,7 +91,7 @@ class Email(Behavior):
         if self.health_msg_y == None:
             yesterday_msg = "had not been started yet"
         else:
-            yesterday_msg = f"""was doing {self.health_msg_y} with a greenery percent of {self.greenery_y}"""
+            yesterday_msg = f"""was doing {self.health_msg_y} with a greenery percent of {round(self.greenery_y, 2)}%"""
 
         date_string = time.strftime('%m-%d-%Y', time.localtime(self.time)) # chat gpt
     
@@ -139,7 +144,7 @@ class Email(Behavior):
             {insolation_msg}
 
         PLANT HEALTH:
-            Our most recent image has a foliage percent of {greenery}%. We have determined the plant is doing {health_msg}, yesterday it {yesterday_msg}.
+            Our most recent image has a foliage percent of {round(greenery, 2)}%. We have determined the plant is doing {health_msg}, yesterday it {yesterday_msg}.
 
         """
 
@@ -147,7 +152,7 @@ class Email(Behavior):
         self.health_msg_y = health_msg
 
         # send email
-        send(from_email, from_pass, to_emails, group_name + date_string, text, images, False)
+        send(from_email, from_pass, to_emails, group_name + date_string, text, images, True)
     # END STUDENT CODE
 
     def perceive(self):
