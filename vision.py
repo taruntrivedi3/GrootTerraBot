@@ -237,14 +237,14 @@ def foliageImages (image):
         height = 0
     foliageImage = cv2.bitwise_and(image, image, mask=foliage_mask)
     boundingBox = findStick(image)
-    image = cv2.line(image, boundingBox[0], boundingBox[1], color=(255, 0, 0), thickness=10)
-    image = cv2.line(image, boundingBox[1], boundingBox[2], color=(255, 0, 0), thickness=10)
-    image = cv2.line(image, boundingBox[2], boundingBox[3], color=(255, 0, 0), thickness=10)
-    image = cv2.line(image, boundingBox[3], boundingBox[0], color=(255, 0, 0), thickness=10)
+    image = cv2.line(image, tuple(boundingBox[0]), tuple(boundingBox[1]), color=(255, 0, 0), thickness=10)
+    image = cv2.line(image, tuple(boundingBox[1]), tuple(boundingBox[2]), color=(255, 0, 0), thickness=10)
+    image = cv2.line(image, tuple(boundingBox[2]), tuple(boundingBox[3]), color=(255, 0, 0), thickness=10)
+    image = cv2.line(image, tuple(boundingBox[3]), tuple(boundingBox[0]), color=(255, 0, 0), thickness=10)
     if height == 0:
         row = boundingBox[3][1]
-    start_point = boundingBox[3][0], row
-    end_point = boundingBox[1][0], row
+    start_point = (boundingBox[3][0], row)
+    end_point = (boundingBox[1][0], row)
     image = cv2.line(image, start_point, end_point, color=(0, 0, 255), thickness=10)
     # END STUDENT CODE
     return foliageImage, image, height
