@@ -57,7 +57,7 @@ class Email(Behavior):
         # Calculating how much water was pumped in over the last day
         try:
             with open('water.txt', 'r') as file:
-                daily_total = float(file.read())
+                daily_total = float((file.read()).strip())
             if daily_total > 0.0:
                 if self.water_level_y == None:
                     water_msg = f"""The agent has been watered {daily_total}ml of water over the past 24 hours."""
