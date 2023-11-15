@@ -135,7 +135,7 @@ class Email(Behavior):
                 -> The light intensity is {round(self.light, 2)}/1000.
                 -> The humidity is {round(self.humid, 2)}%.
                 -> The water level in the resevoir is {round(self.water_level, 2)}mm.
-                -> The weight of soil and plants is {round(self.water_level, 2)}g.
+                -> The weight of soil and plants is {round(self.weight, 2)}g.
                 -> The soil moisture is {round(self.smoist, 2)}.
 
         WATERING:
