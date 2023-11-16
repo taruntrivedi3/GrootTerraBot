@@ -350,7 +350,7 @@ class RaiseSMoist(Behavior):
         self.fsm.add_transition('doStep', 'init', 'init', conditions=['isNextDay', 'watered'], after='nextDay')
         self.fsm.add_transition('doStep', 'init', 'watering', conditions=['isNextDay', 'notWateredEarly'], after=['nextDayWaterEarly', 'setAddWater'])
         self.fsm.add_transition('doStep', 'init', 'watering', conditions=['isNextDay', 'notWateredMiddle'], after=['nextDayWaterMiddle', 'setAddWater'])
-        self.fsm.add_transition('doStep', 'init', 'watering', conditions=['isNextDay', 'notWateredLAte'], after=['nextDayWaterLate', 'setAddWater'])
+        self.fsm.add_transition('doStep', 'init', 'watering', conditions=['isNextDay', 'notWateredLate'], after=['nextDayWaterLate', 'setAddWater'])
         #self.fsm.add_transition('doStep', 'init', 'watering', conditions=['isNextDay', 'notWatered'], after=['nextDayWater', 'setAddWater'])
         #self.fsm.add_transition('doStep', 'init', 'init', conditions=['isNextDay'], after='nextDay')
         self.fsm.add_transition('doStep', 'init', 'waiting', conditions=['isTimeUp'])
