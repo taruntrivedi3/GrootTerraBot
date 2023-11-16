@@ -459,8 +459,6 @@ class RaiseSMoist(Behavior):
         dwater = max(0, dwater)
 
         self.total_water += dwater
-        print("calcWaterAdded: %.1f (%.1f = %.1f - %.1f)"
-              %(self.total_water, dwater, self.weight_est, self.start_weight))
 
 	with open('water.txt', 'r') as file:
             daily_total = file.read()
