@@ -460,7 +460,7 @@ class RaiseSMoist(Behavior):
 
         self.total_water += dwater
 
-	with open('water.txt', 'r') as file:
+        with open('water.txt', 'r') as file:
             daily_total = file.read()
             daily_total = daily_total.strip()
             daily_total = float(daily_total)
