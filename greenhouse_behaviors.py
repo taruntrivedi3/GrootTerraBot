@@ -396,13 +396,13 @@ class RaiseSMoist(Behavior):
         return not(self.watered)
     
     def notWateredEarly(self):
-        return not(self.watered) and self.dayNum<=3
+        return not(self.watered) and self.dayNum<=5
     
     def notWateredMiddle(self):
-        return not(self.watered) and 3<self.dayNum<=8
+        return not(self.watered) and 5<self.dayNum<=9
         
     def notWateredLate(self):   
-        return not(self.watered) and self.dayNum>8
+        return not(self.watered) and self.dayNum>9
     
     def isAddWater(self):
         return self.addWater
