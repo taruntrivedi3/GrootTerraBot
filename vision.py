@@ -22,14 +22,14 @@ def classifyFoliage(image):
     # x_image = cv2.erode(x_image, kernel, iterations=1)
     # x_image = cv2.dilate(x_image, kernel, iterations=1)
     # x_foliage_mask = createMask(x_image, x_rVals, x_color_space)
-    image = gammaCorrection(image, 1.6)
-    x_rVals = [(22, 68), (140, 255), (10, 235)]
+    image = gammaCorrection(image, 1.3)
+    x_rVals = [(15, 80), (120, 255), (100, 255)]
     x_color_space = 'HSV'
     image = cv2.filter2D(image, ddepth=-1, kernel=(np.ones((7,7))/49))
     x_image = transformFromBGR(image, x_color_space)
     foliage_mask = createMask(x_image, x_rVals, x_color_space).astype(np.uint8)
     foliage_mask = cv2.erode(foliage_mask, kernel=np.ones((10,10))) # 3,3 8, 8
-    foliage_mask = cv2.dilate(foliage_mask, kernel=np.ones((17,17)))
+    foliage_mask = cv2.dilate(foliage_mask, kernel=np.ones((18,18)))
     # END STUDENT CODE
     return foliage_mask
 
