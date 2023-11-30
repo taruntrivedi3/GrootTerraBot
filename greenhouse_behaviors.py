@@ -492,7 +492,7 @@ class RaiseSMoist(Behavior):
     def nextDayWaterEarly(self):
         print("Next day! Day: %s" %self.dayNum)
         self.watered = False
-        self.startAddWatering(6)
+        self.startAddWatering(8)
         self.dayNum += 1 
         self.resetTotalWater()  
     
@@ -506,7 +506,7 @@ class RaiseSMoist(Behavior):
     def nextDayWaterLate(self):
         print("Next day! Day: %s" %self.dayNum)
         self.watered = False
-        self.startAddWatering(4)
+        self.startAddWatering(8)
         self.dayNum += 1 
         self.resetTotalWater()          
         
